@@ -1,0 +1,9 @@
+{
+	"name": "su-exec",
+	"description": "Run an executable as root, similar to `sudo` in linux.",
+	"version": "0.1.0",
+	"engines": { "node": ">=0.10.0" },
+	"dependencies": {},
+	"author": "LastLeaf <bqfu@163.com> http://lastleaf.me",
+	"contributors": []
+}

@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +9,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #define REQ_LEN_MAX 32768
 
@@ -21,8 +24,8 @@ void childSig(){
 	if( write(STDOUT_FILENO, str, strlen(str)) ){};
 }
 
-void childProc(char* req, int reqc){
-	int i, spc = 1, in, out, err;
+void childProc(char* req, int reqc, int errPipe){
+	int i, spc = 0, in, out, err;
 	char* sp[REQ_LEN_MAX+1];
 
 	sp[0] = req;
@@ -32,25 +35,43 @@ void childProc(char* req, int reqc){
 	sp[spc] = NULL;
 
 	// redirect
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 	in = open(sp[1], O_RDONLY);
 	out = open(sp[2], O_WRONLY|O_CREAT|O_TRUNC, 0644);
 	err = open(sp[3], O_WRONLY|O_CREAT|O_TRUNC, 0644);
+	if(in == -1 || out == -1 || err == -1) {
+		if(write(errPipe, "ERR\0", 4)) {}
+		_exit(0);
+	}
 	dup2(in, STDIN_FILENO);
 	dup2(out, STDOUT_FILENO);
 	dup2(err, STDERR_FILENO);
 
 	// exec
-	execv(sp[0], sp+4);
+	if(req[0] == 'p') execvp(sp[0], sp+4);
+	else execv(sp[0], sp+4);
+
+	if( write(errPipe, "ERR\0", 4) ){};
+	_exit(0);
 }
 
 void newReq(char* req, int reqc){
 	char str[16];
-	int pid;
+	int pid, pipe[2];
+
 	if(req == NULL) {
 		if( write(STDOUT_FILENO, "+0|", 3) ){};
 		if( write(STDOUT_FILENO, "-0-1-0-0|", 9) ){};
 		return;
 	}
+	if(pipe2(pipe, O_CLOEXEC)) {
+		if( write(STDOUT_FILENO, "+0|", 3) ){};
+		if( write(STDOUT_FILENO, "-0-1-0-0|", 9) ){};
+		return;
+	}
+
 	pid = fork();
 	if(pid < 0) {
 		if( write(STDOUT_FILENO, "+0|", 3) ){};
@@ -58,10 +79,17 @@ void newReq(char* req, int reqc){
 		return;
 	}
 	if(!pid) {
-		childProc(req, reqc);
+		close(pipe[0]);
+		childProc(req, reqc, pipe[1]);
 		return;
 	}
 
+	close(pipe[1]);
+	if(read(pipe[0], str, 4) > 0) {
+		if( write(STDOUT_FILENO, "+0|", 3) ){};
+		if( write(STDOUT_FILENO, "-0-1-0-0|", 9) ){};
+		return;
+	}
 	sprintf(str, "+%d|", pid);
 	if( write(STDOUT_FILENO, str, strlen(str)) ){};
 }
@@ -73,7 +101,11 @@ int main(){
 
 	signal(SIGCHLD, childSig);
 
-	while( (c = read(STDIN_FILENO, buf, REQ_LEN_MAX)) > 0 ){
+	while( (c = read(STDIN_FILENO, buf, REQ_LEN_MAX)) ){
+		if(c < 0) {
+			if(errno == EINTR) continue;
+			break;
+		}
 		prev = 0;
 		for(i=0; i<c; i++) {
 			if(buf[i] == '\x7F') {

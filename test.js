@@ -8,9 +8,13 @@ process.setgid('nogroup');
 process.setuid('nobody');
 
 suExec.execFile('/sbin/ifconfig', ['/sbin/ifconfig'], {
-	stdin: '/dev/null',
-	stdout: '/tmp/test.out',
-	stderr: '/dev/null'
+	stdout: '/tmp/test.out'
 }, function(err, status, signal){
 	console.log(arguments);
+	suExec.execPath('cat', ['cat', '-'], {
+		stdin: '/tmp/test.out',
+		stdout: '/tmp/test.out.2'
+	}, function(){
+		console.log(arguments);
+	});
 });

@@ -13,7 +13,8 @@ Install with `npm install su-exec`.
 
 It should be initialized with `suExec.init()` once before used. The node process should has root privilege at that moment.
 
-Then exec with `suExec.execFile(file, argv, options, cb)`
+Then exec with `suExec.execFile(file, argv, options, cb)`, or `suExec.execPath(file, argv, options, cb)`.
+The `execPath` method could search executables in PATH (just like what shell does).
 
 ```js
 var suExec = require('su-exec');

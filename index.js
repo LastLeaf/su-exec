@@ -45,7 +45,7 @@ exports.init = function(){
 				var info = str.split('-');
 				if(Number(info[2])) var err = new Error('Su-exec failed to execute.');
 				else var err = null;
-				if(info[1]) {
+				if(cbMap[info[1]]) {
 					cbMap[info[1]](err, Number(info[3]), Number(info[4]));
 					delete cbMap[info[1]];
 				} else {
@@ -56,16 +56,19 @@ exports.init = function(){
 	});
 };
 
-exports.execFile = function(file, argv, options, cb){
+var exec = function(type, file, argv, options, cb){
 	if(!rootProc) {
 		setTimeout(function(){
 			cb(new Error('Su-exec should be initialized before using.'));
 		}, 0);
 		return;
 	}
-	if(typeof(options) === 'function') cb = options;
+	if(typeof(options) === 'function') {
+		cb = options;
+		options = {};
+	}
 
-	var strs = [ file, options.stdin || '/dev/null', options.stdout || '/dev/null', options.stderr || '/dev/null' ].concat(argv);
+	var strs = [ type, file, options.stdin || '/dev/null', options.stdout || '/dev/null', options.stderr || '/dev/null' ].concat(argv);
 	reqQueue.push(cb);
 
 	var bufs = [];
@@ -79,4 +82,12 @@ exports.execFile = function(file, argv, options, cb){
 	}
 	bufs.push(endBuf);
 	rootProc.stdin.write(Buffer.concat(bufs));
+};
+
+exports.execFile = function(file, argv, options, cb){
+	exec('f', file, argv, options, cb);
+};
+
+exports.execPath = function(file, argv, options, cb){
+	exec('p', file, argv, options, cb);
 };

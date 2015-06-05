@@ -7,6 +7,77 @@ suExec.init();
 process.setgid('nogroup');
 process.setuid('nobody');
 
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+suExec.execPath('echo', ['echo', 'hello']);
+
 suExec.execFile('/sbin/ifconfig', ['/sbin/ifconfig'], {
 	stdout: '/tmp/test.out'
 }, function(err, status, signal){
@@ -16,5 +87,6 @@ suExec.execFile('/sbin/ifconfig', ['/sbin/ifconfig'], {
 		stdout: '/tmp/test.out.2'
 	}, function(){
 		console.log(arguments);
+		suExec.destroy();
 	});
 });

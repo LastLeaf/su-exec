@@ -6,6 +6,12 @@ var rootProc = null;
 var reqQueue = [];
 var cbMap = {};
 
+exports.destroy = function(){
+	var rp = rootProc;
+	rootProc = null;
+	rp.stdin.end();
+};
+
 exports.init = function(){
 	if(rootProc) return;
 
@@ -20,9 +26,9 @@ exports.init = function(){
 	rootProc.on('error', function(){
 		rootProc = null;
 	});
-	rootProc.on('exit', function(){
+	rootProc.once('exit', function(){
 		// quit current process if root process is killed
-		process.exit();
+		if(rootProc) process.exit();
 	});
 
 	rootProc.stdout.on('data', function(buf){
@@ -35,7 +41,7 @@ exports.init = function(){
 				// new process
 				var pid = str.slice(1);
 				if(cbMap[pid]) {
-					cb.call(global, cbMap[pid]);
+					reqQueue.shift().apply(global, cbMap[pid]);
 					delete cbMap[info[1]];
 				} else {
 					cbMap[pid] = reqQueue.shift();
@@ -67,6 +73,10 @@ var exec = function(type, file, argv, options, cb){
 		cb = options;
 		options = {};
 	}
+	if(typeof(cb) !== 'function') {
+		cb = function(){};
+		options = {};
+	}
 
 	var strs = [ type, file, options.stdin || '/dev/null', options.stdout || '/dev/null', options.stderr || '/dev/null' ].concat(argv);
 	reqQueue.push(cb);
@@ -77,7 +87,7 @@ var exec = function(type, file, argv, options, cb){
 	var endBuf = new Buffer(1);
 	endBuf[0] = 127;
 	for(var i=0; i<strs.length; i++) {
-		bufs.push( new Buffer(strs[i]) );
+		bufs.push( new Buffer(strs[i].replace(/[\0\x7F]/g, '')) );
 		bufs.push( emptyBuf );
 	}
 	bufs.push(endBuf);

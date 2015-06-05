@@ -17,11 +17,12 @@ void childSig(){
 	int pid, status, exit = 0, sig = 0;
 	char str[32];
 
-	pid = wait(&status);
-	if(WIFEXITED(status)) exit = WEXITSTATUS(status);
-	if(WIFSIGNALED(status)) sig = WTERMSIG(status);
-	sprintf(str, "-%d-0-%d-%d|", pid, exit, sig);
-	if( write(STDOUT_FILENO, str, strlen(str)) ){};
+	while( (pid = waitpid(-1, &status, WNOHANG)) > 0 ){
+		if(WIFEXITED(status)) exit = WEXITSTATUS(status);
+		if(WIFSIGNALED(status)) sig = WTERMSIG(status);
+		sprintf(str, "-%d-0-%d-%d|", pid, exit, sig);
+		if( write(STDOUT_FILENO, str, strlen(str)) ){};
+	}
 }
 
 void childProc(char* req, int reqc, int errPipe){

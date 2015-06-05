@@ -36,6 +36,8 @@ suExec.execFile('/usr/bin/whoami', ['/usr/bin/whoami'], {
 Available options are `stdin`, `stdout`, and `stderr`, indicating the files which should be redirected.
 They are "/dev/null" by default.
 
+There is also a `suExec.destroy()` to end the background root process.
+
 ## LICENSE ##
 
 MIT

@@ -18,7 +18,6 @@ exports.init = function(){
 	// start root daemon
 	if(process.getuid() !== 0) {
 		throw('Su-exec module should be initialized with root privilege.');
-		return -1;
 	}
 	rootProc = childProcess.execFile(__dirname + '/build/Release/su-exec');
 
@@ -34,7 +33,7 @@ exports.init = function(){
 	rootProc.stdout.on('data', function(buf){
 		var prev = 0;
 		for(var i=0; i<buf.length; i++) {
-			if(buf[i] != '|') continue;
+			if(buf[i] !== '|') continue;
 			var str = buf.slice(prev, i).toString('utf8');
 			prev = i+1;
 			if(str.charAt(0) === '+') {
@@ -42,15 +41,15 @@ exports.init = function(){
 				var pid = str.slice(1);
 				if(cbMap[pid]) {
 					reqQueue.shift().apply(global, cbMap[pid]);
-					delete cbMap[info[1]];
+					delete cbMap[pid];
 				} else {
 					cbMap[pid] = reqQueue.shift();
 				}
 			} else if(str.charAt(0) === '-') {
 				// end process
 				var info = str.split('-');
-				if(Number(info[2])) var err = new Error('Su-exec failed to execute.');
-				else var err = null;
+				var err = null;
+				if(Number(info[2])) err = new Error('Su-exec failed to execute.');
 				if(cbMap[info[1]]) {
 					cbMap[info[1]](err, Number(info[3]), Number(info[4]));
 					delete cbMap[info[1]];
